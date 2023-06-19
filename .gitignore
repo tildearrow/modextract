@@ -1,0 +1,8 @@
+.vscode/
+build/
+*.swp
+.cache/
+.DS_Store
+.vs/
+CMakeSettings.json
+CMakePresets.json
