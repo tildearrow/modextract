@@ -216,6 +216,9 @@ int goAhead(const char* path) {
     strncat(str,".wav",4095);
 
     unsigned int actualLen=(((mod.ins[i].len>>8)|(mod.ins[i].len<<8))&0xffff)<<1;
+    unsigned int actualLoopStart=(((mod.ins[i].loopStart>>8)|(mod.ins[i].loopStart<<8))&0xffff)<<1;
+    unsigned int actualLoopLen=(((mod.ins[i].loopLen>>8)|(mod.ins[i].loopLen<<8))&0xffff)<<1;
+    unsigned int actualLoopEnd=actualLoopStart+actualLoopLen;
     if (actualLen==0) continue;
 
     unsigned char* data=malloc(actualLen);
@@ -253,6 +256,24 @@ int goAhead(const char* path) {
       fprintf(stderr,"%s: could not open .wav file: %s\n",path,sf_strerror(NULL));
       free(data);
       continue;
+    }
+
+    SF_INSTRUMENT sfIns;
+    memset(&sfIns,0,sizeof(SF_INSTRUMENT));
+
+    sfIns.gain=1;
+    sfIns.basenote=60;
+    sfIns.detune=0;
+    sfIns.velocity_hi=127;
+    sfIns.key_hi=127;
+
+    if (actualLoopLen>=2 && actualLoopStart<actualLen) {
+      sfIns.loop_count=1;
+      sfIns.loops[0].mode=SF_LOOP_FORWARD;
+      sfIns.loops[0].start=actualLoopStart;
+      sfIns.loops[0].end=actualLoopEnd;
+    } else {
+      sfIns.loop_count=0;
     }
 
     if (sf_write_raw(sf,data,howMuch)!=(sf_count_t)howMuch) {
