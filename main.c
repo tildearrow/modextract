@@ -267,7 +267,7 @@ int goAhead(const char* path) {
     sfIns.velocity_hi=127;
     sfIns.key_hi=127;
 
-    if (actualLoopLen>=2 && actualLoopStart<actualLen) {
+    if (actualLoopLen>2 && actualLoopStart<actualLen) {
       sfIns.loop_count=1;
       sfIns.loops[0].mode=SF_LOOP_FORWARD;
       sfIns.loops[0].start=actualLoopStart;
@@ -275,6 +275,7 @@ int goAhead(const char* path) {
     } else {
       sfIns.loop_count=0;
     }
+    sf_command(sf,SFC_SET_INSTRUMENT,&sfIns,sizeof(SF_INSTRUMENT));
 
     if (sf_write_raw(sf,data,howMuch)!=(sf_count_t)howMuch) {
       fprintf(stderr,"%s: did not write entirely\n",path);
