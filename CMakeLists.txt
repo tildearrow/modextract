@@ -10,9 +10,16 @@ set(CMAKE_PROJECT_VERSION_MAJOR 1)
 set(CMAKE_PROJECT_VERSION_MINOR 0)
 set(CMAKE_PROJECT_VERSION_PATCH 0)
 
+if (NOT MSVC AND NOT ANDROID)
+  set(BUILD_STATIC_DEFAULT ON)
+else()
+  set(BUILD_STATIC_DEFAULT OFF)
+endif()
+
 include(TestBigEndian)
 
 option(SYSTEM_LIBSNDFILE "Use a system-installed version of libsndfile instead of the vendored one" OFF)
+option(BUILD_STATIC "Build a static binary" ${BUILD_STATIC_DEFAULT})
 
 set(DEPENDENCIES_INCLUDE_DIRS "")
 
@@ -52,6 +59,10 @@ else()
 endif()
 
 add_executable(modextract main.c)
+
+if (BUILD_STATIC)
+  list(APPEND DEPENDENCIES_LIBRARIES -static)
+endif()
 
 target_include_directories(modextract SYSTEM PRIVATE ${DEPENDENCIES_INCLUDE_DIRS})
 target_compile_definitions(modextract PRIVATE ${DEPENDENCIES_DEFINES})
